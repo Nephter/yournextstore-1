@@ -2,9 +2,11 @@ import { publicUrl } from "@/env.mjs";
 import { getTranslations } from "@/i18n/server";
 import StoreConfig from "@/store.config";
 import { CategoryBox } from "@/ui/category-box";
+import InfoBanner from "@/ui/info-banner";
 import { ProductList } from "@/ui/products/product-list";
 import { YnsLink } from "@/ui/yns-link";
 import * as Commerce from "commerce-kit";
+import { unstable_noStore as noStore } from "next/cache";
 import Image from "next/image";
 import type { Metadata } from "next/types";
 
@@ -13,12 +15,15 @@ export const metadata = {
 } satisfies Metadata;
 
 export default async function Home() {
+	noStore();
+
 	const products = await Commerce.productBrowse({ first: 6 });
 	const t = await getTranslations("/");
+	console.log("🚀 ~ Home ~ products:", products);
 
 	return (
 		<main>
-			<section className="rounded bg-neutral-100 py-8 sm:py-12">
+			<div className="rounded bg-neutral-100 py-8 sm:py-12">
 				<div className="mx-auto grid grid-cols-1 items-center justify-items-center gap-8 px-8 sm:px-16 md:grid-cols-2">
 					<div className="max-w-md space-y-4">
 						<h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">{t("hero.title")}</h2>
@@ -44,7 +49,9 @@ export default async function Home() {
 						sizes="(max-width: 640px) 70vw, 450px"
 					/>
 				</div>
-			</section>
+			</div>
+
+			<InfoBanner />
 
 			<ProductList products={products} />
 
