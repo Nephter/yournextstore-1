@@ -9,13 +9,13 @@ import React from "react";
 const InfoBanner = () => {
 	return (
 		<Card className="relative -mt-8">
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 ">
+			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 gap-2">
 				{/* Avatar + Seller Info */}
 				<div className="flex items-start gap-4 w-full sm:w-auto">
 					{/* Avatar - Floats out of card on mobile */}
 					<div className="relative">
-						<Avatar className="w-16 h-16 absolute -top-13 left-0 sm:static sm:w-16 sm:h-16">
-							<AvatarImage src="/avatar.jpg" alt="RRRSHOPS Owner" />
+						<Avatar className="w-18 h-18 absolute -top-13 left-0 sm:static sm:w-18 sm:h-18 p-0 m-0">
+							<AvatarImage src="/gangar.png" alt="RRRSHOPS Owner" />
 							<AvatarFallback>RS</AvatarFallback>
 						</Avatar>
 					</div>
@@ -173,7 +173,7 @@ const InfoBanner = () => {
 					<div className="hidden sm:block">
 						<div className="flex flex-col items-start gap-1">
 							<div className="flex items-center gap-2">
-								<TruckIcon className="w-6 h-6 text-purple-500 hover:text-purple-700 " />
+								<TruckIcon className="w-6 h-6 text-purple-500 " />
 								<p className="font-semibold">Smooth Dispatch</p>
 							</div>
 							<p className="text-xs text-neutral-600">History of dispatching on time with tracking.</p>
@@ -211,7 +211,7 @@ const InfoBanner = () => {
 					<div className="hidden sm:block">
 						<div className="flex flex-col items-start gap-1">
 							<div className="flex items-center gap-2">
-								<MessageCircleReplyIcon className="w-6 h-6 text-purple-500 hover:text-purple-700 " />
+								<MessageCircleReplyIcon className="w-6 h-6 text-purple-500  " />
 								<p className="font-semibold">Speedy Replies</p>
 							</div>
 							<p className="text-xs text-neutral-600">History of replying to messages quickly.</p>
@@ -249,7 +249,7 @@ const InfoBanner = () => {
 					<div className="hidden sm:block">
 						<div className="flex flex-col items-start gap-1">
 							<div className="flex items-center gap-2">
-								<HandHeartIcon className="w-6 h-6 text-purple-500 hover:text-purple-700 " />
+								<HandHeartIcon className="w-6 h-6 text-purple-500  " />
 								<p className="font-semibold">Rave Reviews</p>
 							</div>
 							<p className="text-xs text-neutral-600">Average review is 4.8 or higher</p>

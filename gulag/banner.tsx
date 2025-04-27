@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { useState } from "react";
-import { YnsLink } from "./yns-link";
+// import { YnsLink } from "./yns-link";
 
 export const Banner = () => {
 	const [isOpen, setIsOpen] = useState(() => localStorage.getItem("banner") !== "true");
@@ -22,12 +22,12 @@ export const Banner = () => {
 						<p className="text-center text-sm font-medium">
 							🎉 Your Next Store adds 3D product previews powered by Spline
 						</p>
-						<YnsLink
+						{/* <YnsLink
 							href="/product/horizon-gaze-sunglasses"
 							className="flex-none rounded-full bg-indigo-500 px-3 py-1 text-sm font-semibold text-white shadow-xs hover:bg-indigo-600"
 						>
 							Check it out
-						</YnsLink>
+						</YnsLink> */}
 					</div>
 				</div>
 				<button

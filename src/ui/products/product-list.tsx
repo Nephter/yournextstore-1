@@ -10,7 +10,7 @@ export const ProductList = async ({ products }: { products: Commerce.MappedProdu
 
 	return (
 		<>
-			<ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
 				{products.map((product, idx) => {
 					return (
 						<li key={product.id} className="group">
@@ -30,6 +30,7 @@ export const ProductList = async ({ products }: { products: Commerce.MappedProdu
 											/>
 										</div>
 									)}
+
 									<div className="p-2">
 										<h2 className="text-xl font-medium text-neutral-700">{product.name}</h2>
 										<footer className="text-base font-normal text-neutral-900">
