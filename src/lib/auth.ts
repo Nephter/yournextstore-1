@@ -4,6 +4,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { db } from "@/lib/db"; // adjust if your database connection is different
+import bcrypt from "bcryptjs"; // bcryptjs for password hashing
+
 if (!process.env.SECRET) {
 	throw new Error("SECRET must be defined");
 }
@@ -19,6 +22,54 @@ interface SessionData extends JWTPayload {
 	user: User;
 	expires: number;
 }
+
+export async function register(formData: FormData) {
+	const name = formData.get("name") as string;
+	const email = formData.get("email") as string;
+	const password = formData.get("password") as string;
+
+	if (!name || !email || !password) {
+		return { error: "Missing fields." };
+	}
+
+	const existingUser = await db.user.findUnique({
+		where: { email },
+	});
+
+	if (existingUser) {
+		return { error: "Email already registered." };
+	}
+
+	const passwordHash = await bcrypt.hash(password, 10);
+
+	await db.user.create({
+		data: {
+			name,
+			email,
+			password: passwordHash,
+		},
+	});
+
+	return { success: true };
+}
+
+// export async function register(formData: FormData) {
+// 	const name = formData.get("name") as string;
+// 	const email = formData.get("email") as string;
+// 	const password = formData.get("password") as string;
+
+// 	const hashedPassword = await bcrypt.hash(password, 10);
+
+// 	await db.user.create({
+// 		data: {
+// 			name,
+// 			email,
+// 			password: hashedPassword,
+// 		},
+// 	});
+
+// 	// ✅ No return value needed
+// }
 
 export async function encrypt(payload: SessionData): Promise<string> {
 	return await new SignJWT(payload)
