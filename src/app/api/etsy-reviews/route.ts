@@ -1,40 +1,52 @@
 import { NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+
+// Define the structure of the user in a review
+interface EtsyUser {
+	login_name?: string;
+}
+
+// Define the structure of a single review
+interface Review {
+	rating: number;
+	review: string;
+	user?: EtsyUser;
+}
+
+// Define the full Etsy API response structure
+interface EtsyResponse {
+	results: Review[];
+}
 
 export async function GET() {
-	const browser = await puppeteer.launch({
-		headless: true, // Run in headless mode
-		args: ["--no-sandbox", "--disable-setuid-sandbox"],
-	});
-
-	const page = await browser.newPage();
-	await page.goto("https://www.etsy.com/shop/rrrshops/reviews", {
-		waitUntil: "networkidle2", // Wait for the page to load fully
-	});
-
-	// Wait for the reviews to load
-	await page.waitForSelector(".shop2-review-attribution");
-
-	// Extract reviews from the page
-	const reviews = await page.evaluate(() => {
-		const reviewElements = Array.from(document.querySelectorAll(".wt-bt-xs"));
-
-		return reviewElements.map((el) => {
-			const reviewerName = el.querySelector(".shop2-review-attribution a")?.textContent || "Anonymous";
-			const reviewText = el.querySelector(".prose")?.textContent || "No review text";
-			const rating = el.querySelector('input[name="rating"]')?.getAttribute("value") || "5";
-			const reviewPhoto = el.querySelector(".appreciation-photo__container img")?.getAttribute("src") || null;
-
-			return {
-				reviewerName,
-				reviewText,
-				rating,
-				reviewPhoto,
-			};
+	try {
+		const res = await fetch(`https://openapi.etsy.com/v3/application/shops/rrrshops/reviews`, {
+			headers: {
+				"x-api-key": process.env.ETSY_API_KEY as string,
+				Authorization: `Bearer ${process.env.ETSY_ACCESS_TOKEN}`, // if required
+			},
 		});
-	});
 
-	await browser.close();
+		if (!res.ok) {
+			throw new Error("Failed to fetch reviews from Etsy");
+		}
 
-	return NextResponse.json(reviews);
+		const data = (await res.json()) as EtsyResponse;
+
+		return NextResponse.json({
+			reviews: data.results.map((review: Review) => ({
+				rating: review.rating,
+				text: review.review,
+				user: review.user?.login_name || "Anonymous",
+			})),
+			shopUrl: `https://www.etsy.com/shop/rrrshops?section_id=reviews`,
+		});
+	} catch (err: unknown) {
+		// make sure error type is handled properly
+		let message = "Unknown error";
+		if (err instanceof Error) {
+			message = err.message;
+		}
+
+		return NextResponse.json({ error: message }, { status: 500 });
+	}
 }

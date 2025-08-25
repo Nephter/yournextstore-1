@@ -8,7 +8,7 @@ export const env = createEnv({
 		// Can be provided via env or parameters to Commerce Kit, thus optional
 		STRIPE_SECRET_KEY: z.string().optional(),
 		// Required in Commerce Kit
-		STRIPE_CURRENCY: z.string(),
+		STRIPE_CURRENCY: z.string().optional(),
 		STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
 		ENABLE_STRIPE_TAX: z
@@ -52,10 +52,10 @@ export const env = createEnv({
 const vercelHost =
 	process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
 		? process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
-		: process.env.NEXT_PUBLIC_VERCEL_URL;
+		: process.env.NEXT_PUBLIC_URL;
 const vercelUrl = vercelHost ? `https://${vercelHost}` : undefined;
 const publicUrl = process.env.NEXT_PUBLIC_URL || vercelUrl;
-
+console.log("URL", publicUrl);
 if (!publicUrl) {
 	throw new Error("Missing NEXT_PUBLIC_URL or NEXT_PUBLIC_VERCEL_URL variables!");
 }
