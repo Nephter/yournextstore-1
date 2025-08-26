@@ -36,15 +36,15 @@ export const generateMetadata = async (props: {
 	const selectedVariant = searchParams.variant || variants[0]?.metadata.variant;
 	const product = variants.find((variant) => variant.metadata.variant === selectedVariant);
 	if (!product) {
+		console.log("Product not found for slug:", params.slug);
 		return notFound();
 	}
 	const t = await getTranslations("/product.metadata");
 
-	const canonical = new URL(`${publicUrl}/product/${product.metadata.slug}`);
+	const canonical = new URL(`http://${publicUrl}/product/${product.metadata.slug}`);
 	if (selectedVariant) {
 		canonical.searchParams.set("variant", selectedVariant);
 	}
-
 	const productName = formatProductName(product.name, product.metadata.variant);
 
 	return {
@@ -81,7 +81,7 @@ export default async function SingleProductPage(props: {
 				<BreadcrumbList>
 					<BreadcrumbItem>
 						<BreadcrumbLink asChild className="inline-flex min-h-12 min-w-12 items-center justify-center">
-							<YnsLink href="/products">{t("allProducts")}</YnsLink>
+							<YnsLink href="/product">{t("allProducts")}</YnsLink>
 						</BreadcrumbLink>
 					</BreadcrumbItem>
 					{category && (

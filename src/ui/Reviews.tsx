@@ -1,13 +1,13 @@
 "use client";
 
 import { Button } from "@/ui/shadcn/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/shadcn/card";
+import { Card, CardContent, CardHeader } from "@/ui/shadcn/card";
 import Image from "next/image";
 import Link from "next/link";
 
 export function Reviews() {
 	return (
-		<section className="max-w-md mx-auto px-4 py-12">
+		<section className="max-w-md mx-auto px-4 pb-10">
 			<Card className="rounded-2xl shadow-lg bg-gradient-to-br from-purple-100 via-purple-50 to-pink-50">
 				<CardHeader className="flex flex-col items-center">
 					<Image
