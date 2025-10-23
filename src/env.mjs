@@ -55,7 +55,7 @@ const vercelHost =
 		: process.env.NEXT_PUBLIC_URL;
 const vercelUrl = vercelHost ? `https://${vercelHost}` : undefined;
 const publicUrl = process.env.NEXT_PUBLIC_URL || vercelUrl;
-console.log("URL", publicUrl);
+
 if (!publicUrl) {
 	throw new Error("Missing NEXT_PUBLIC_URL or NEXT_PUBLIC_VERCEL_URL variables!");
 }
