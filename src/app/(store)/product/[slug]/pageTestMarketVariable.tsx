@@ -1,12 +1,4 @@
 import { ProductImageModal } from "@/app/(store)/product/[slug]/product-image-modal";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbPage,
-	BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { publicUrl } from "@/env.mjs";
 import { getLocale, getTranslations } from "@/i18n/server";
 import { getRecommendedProducts } from "@/lib/search/trieve";
@@ -66,7 +58,6 @@ export default async function SingleProductPage(props: {
 
 	const t = await getTranslations("/product.page");
 	const locale = await getLocale();
-	const category = product.metadata.category;
 
 	//-----------------------------------------------------
 	// ✅ Merge product.images with marketing_features / metadata
@@ -78,13 +69,6 @@ export default async function SingleProductPage(props: {
 				(f.startsWith("http://") || f.startsWith("https://")) &&
 				/\.(jpg|jpeg|png|webp|gif)$/i.test(f),
 		) || [];
-
-	const metadataImages = Object.values(product.metadata || {}).filter(
-		(val) =>
-			typeof val === "string" &&
-			(val.startsWith("http://") || val.startsWith("https://")) &&
-			/\.(jpg|jpeg|png|webp|gif)$/i.test(val),
-	);
 
 	// You can choose which source to prioritize:
 	const images = [...(product.images || []), ...marketingImages];
