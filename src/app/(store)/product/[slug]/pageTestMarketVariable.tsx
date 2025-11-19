@@ -1,4 +1,3 @@
-// import { ProductModel3D } from "@/app/(store)/product/[slug]/product-model3d";
 import { ProductImageModal } from "@/app/(store)/product/[slug]/product-image-modal";
 import {
 	Breadcrumb,
@@ -39,12 +38,10 @@ export const generateMetadata = async (props: {
 		console.log("Product not found for slug:", params.slug);
 		return notFound();
 	}
-	const t = await getTranslations("/product.metadata");
 
+	const t = await getTranslations("/product.metadata");
 	const canonical = new URL(`http://${publicUrl}/product/${product.metadata.slug}`);
-	if (selectedVariant) {
-		canonical.searchParams.set("variant", selectedVariant);
-	}
+	if (selectedVariant) canonical.searchParams.set("variant", selectedVariant);
 	const productName = formatProductName(product.name, product.metadata.variant);
 
 	return {
@@ -65,54 +62,39 @@ export default async function SingleProductPage(props: {
 	const selectedVariant = (variants.length > 1 && searchParams.variant) || variants[0]?.metadata.variant;
 	const product = variants.find((variant) => variant.metadata.variant === selectedVariant);
 
-	if (!product) {
-		return notFound();
-	}
-	{
-		console.log("PRODUCT", product);
-	}
+	if (!product) return notFound();
+
 	const t = await getTranslations("/product.page");
 	const locale = await getLocale();
-
 	const category = product.metadata.category;
-	const images = product.images;
+
+	//-----------------------------------------------------
+	// ✅ Merge product.images with marketing_features / metadata
+	//-----------------------------------------------------
+	const marketingImages =
+		product.marketing_features?.filter(
+			(f) =>
+				typeof f === "string" &&
+				(f.startsWith("http://") || f.startsWith("https://")) &&
+				/\.(jpg|jpeg|png|webp|gif)$/i.test(f),
+		) || [];
+
+	const metadataImages = Object.values(product.metadata || {}).filter(
+		(val) =>
+			typeof val === "string" &&
+			(val.startsWith("http://") || val.startsWith("https://")) &&
+			/\.(jpg|jpeg|png|webp|gif)$/i.test(val),
+	);
+
+	// You can choose which source to prioritize:
+	const images = [...(product.images || []), ...marketingImages];
+	//-----------------------------------------------------
 
 	return (
 		<article className="pb-12">
-			{/* <Breadcrumb>
-				<BreadcrumbList>
-					<BreadcrumbItem>
-						<BreadcrumbLink asChild className="inline-flex min-h-12 min-w-12 items-center justify-center">
-							<YnsLink href="/product">{t("allProducts")}</YnsLink>
-						</BreadcrumbLink>
-					</BreadcrumbItem>
-					{category && (
-						<>
-							<BreadcrumbSeparator />
-							<BreadcrumbItem>
-								<BreadcrumbLink className="inline-flex min-h-12 min-w-12 items-center justify-center" asChild>
-									<YnsLink href={`/category/${category}`}>{deslugify(category)}</YnsLink>
-								</BreadcrumbLink>
-							</BreadcrumbItem>
-						</>
-					)}
-					<BreadcrumbSeparator />
-					<BreadcrumbItem>
-						<BreadcrumbPage>{product.name}</BreadcrumbPage>
-					</BreadcrumbItem>
-					{selectedVariant && (
-						<>
-							<BreadcrumbSeparator />
-							<BreadcrumbItem>
-								<BreadcrumbPage>{deslugify(selectedVariant)}</BreadcrumbPage>
-							</BreadcrumbItem>
-						</>
-					)}
-				</BreadcrumbList>
-			</Breadcrumb> */}
-
 			<StickyBottom product={product} locale={locale}>
 				<div className="mt-4 grid gap-4 lg:grid-cols-12">
+					{/* Product Info */}
 					<div className="lg:col-span-5 lg:col-start-8">
 						<h1 className="text-3xl font-bold leading-none tracking-tight text-foreground">{product.name}</h1>
 						{product.default_price.unit_amount && (
@@ -127,48 +109,37 @@ export default async function SingleProductPage(props: {
 						<div className="mt-2">{product.metadata.stock <= 0 && <div>Out of stock</div>}</div>
 					</div>
 
+					{/* Product Images */}
 					<div className="lg:col-span-7 lg:row-span-3 lg:row-start-1">
 						<h2 className="sr-only">{t("imagesTitle")}</h2>
-
 						<div className="grid gap-4 lg:grid-cols-3 [&>*:first-child]:col-span-3">
-							{/* {product.metadata.preview && (
-								<ProductModel3D model3d={product.metadata.preview} imageSrc={product.images[0]} />
-							)} */}
 							{images.map((image, idx) => {
-								const params = new URLSearchParams({
-									image: idx.toString(),
-								});
-								if (searchParams.variant) {
-									params.set("variant", searchParams.variant);
-								}
-								console.log("params", params);
-								console.log("idx", idx);
+								const params = new URLSearchParams({ image: idx.toString() });
+								if (searchParams.variant) params.set("variant", searchParams.variant);
+
 								return (
 									<div key={idx} className="w-full flex justify-center">
 										<YnsLink key={idx} href={`?${params}`} scroll={false}>
 											{idx === 0 && !product.metadata.preview ? (
 												<MainProductImage
 													key={image}
-													className=" rounded-lg bg-neutral-100 object-center transition-opacity"
+													className="rounded-lg bg-neutral-100 object-center transition-opacity"
 													src={image}
 													loading="eager"
 													priority
 													alt=""
 												/>
 											) : (
-												<div>
-													<Image
-														key={image}
-														className=" rounded-lg bg-neutral-100 object-center transition-opacity"
-														src={image}
-														width={400 / 3}
-														height={400 / 3}
-														sizes="(max-width: 1024x) 33vw, (max-width: 1280px) 20vw, 225px"
-														loading="eager"
-														priority
-														alt=""
-													/>
-												</div>
+												<Image
+													key={image}
+													className="rounded-lg bg-neutral-100 object-center transition-opacity"
+													src={image}
+													width={400 / 3}
+													height={400 / 3}
+													sizes="(max-width: 1024x) 33vw, (max-width: 1280px) 20vw, 225px"
+													loading="lazy"
+													alt=""
+												/>
 											)}
 										</YnsLink>
 									</div>
@@ -177,18 +148,22 @@ export default async function SingleProductPage(props: {
 						</div>
 					</div>
 
+					{/* Description + Variants */}
 					<div className="grid gap-8 lg:col-span-5">
 						<section>
 							<h2 className="sr-only">{t("descriptionTitle")}</h2>
 							<div className="prose text-secondary-foreground">
 								<Markdown source={product.description || ""} />
 							</div>
+							{/* Example: Display first few marketing features as text */}
 							<div className="prose text-secondary-foreground">
-								<p>{product.marketing_features[0]}</p>
-								<p>{product.marketing_features[1]}</p>
+								{product.marketing_features?.slice(0, 2).map((f, i) => (
+									<p key={i}>{f}</p>
+								))}
 							</div>
 						</section>
 
+						{/* Variants */}
 						{variants.length > 1 && (
 							<div className="grid gap-2">
 								<p className="text-base font-medium" id="variant-label">
@@ -219,11 +194,14 @@ export default async function SingleProductPage(props: {
 								</ul>
 							</div>
 						)}
+
+						{/* Add to cart */}
 						<AddToCartButton productId={product.id} disabled={product.metadata.stock <= 0} />
 					</div>
 				</div>
 			</StickyBottom>
 
+			{/* Similar products & modal */}
 			<Suspense>
 				<SimilarProducts id={product.id} />
 			</Suspense>
@@ -239,10 +217,7 @@ export default async function SingleProductPage(props: {
 
 async function SimilarProducts({ id }: { id: string }) {
 	const products = await getRecommendedProducts({ productId: id, limit: 4 });
-
-	if (!products) {
-		return null;
-	}
+	if (!products) return null;
 
 	return (
 		<section className="py-12">
@@ -257,9 +232,7 @@ async function SimilarProducts({ id }: { id: string }) {
 							{trieveMetadata.image_url && (
 								<YnsLink href={`${publicUrl}${product.link}`} className="block" prefetch={false}>
 									<Image
-										className={
-											"w-full rounded-lg bg-neutral-100 object-cover object-center group-hover:opacity-80 transition-opacity"
-										}
+										className="w-full rounded-lg bg-neutral-100 object-cover object-center group-hover:opacity-80 transition-opacity"
 										src={trieveMetadata.image_url}
 										width={300}
 										height={300}
@@ -290,3 +263,5 @@ async function SimilarProducts({ id }: { id: string }) {
 		</section>
 	);
 }
+
+//// this is set up to allow tim to add urls to the marketing feature list on stripe. they should then be filtered from the non URLS and displayed in the proper location. this hasnt been tested yet because stripe and my app arent updating.
