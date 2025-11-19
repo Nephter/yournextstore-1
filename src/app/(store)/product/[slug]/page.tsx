@@ -1,13 +1,5 @@
 // import { ProductModel3D } from "@/app/(store)/product/[slug]/product-model3d";
 import { ProductImageModal } from "@/app/(store)/product/[slug]/product-image-modal";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbPage,
-	BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { publicUrl } from "@/env.mjs";
 import { getLocale, getTranslations } from "@/i18n/server";
 import { getRecommendedProducts } from "@/lib/search/trieve";
@@ -74,7 +66,6 @@ export default async function SingleProductPage(props: {
 	const t = await getTranslations("/product.page");
 	const locale = await getLocale();
 
-	const category = product.metadata.category;
 	const images = product.images;
 
 	return (
